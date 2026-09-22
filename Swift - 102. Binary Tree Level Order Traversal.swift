@@ -13,7 +13,7 @@ public class TreeNode {
         self.right = right
     }
 }
-    
+
 /**
  * Definition for a binary tree node.
  * public class TreeNode {
@@ -30,44 +30,45 @@ public class TreeNode {
  * }
  */
 class Solution {
-    func isSameTree(_ p: TreeNode?, _ q: TreeNode?) -> Bool {
-        guard let p=p, let q=q else {
-            return p?.val == q?.val
+    func levelOrder(_ root: TreeNode?) -> [[Int]] {
+        guard let root = root else {
+            return []
         }
-        if p.val != q.val { return false }
-        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right)
+
+        var result: [[Int]] = []
+        
+        var currentLevel = [root]
+        
+        while !currentLevel.isEmpty {
+            result.append(currentLevel.map(\.val))
+            currentLevel = currentLevel.flatMap({ [$0.left, $0.right].compactMap({$0})})
+        }
+        
+        return result
     }
 }
 
 class SolutionTests: XCTestCase {
     func testCase1() {
-        // Empty
-        XCTAssertTrue(Solution().isSameTree(nil, nil))
+        XCTAssertEqual(Solution().levelOrder(TreeNode(1)), [[1]])
     }
     
     func testCase2() {
-        XCTAssertTrue(Solution().isSameTree(TreeNode(1, nil, nil), TreeNode(1, nil, nil)))
+        XCTAssertEqual(Solution().levelOrder(TreeNode(1,
+                                                      TreeNode(2),
+                                                      TreeNode(3))),
+                       [[1], [2,3]])
     }
     
     func testCase3() {
-        XCTAssertTrue(Solution().isSameTree(
-            TreeNode(1, TreeNode(2), TreeNode(3)),
-            TreeNode(1, TreeNode(2), TreeNode(3))
-        ))
+        XCTAssertEqual(Solution().levelOrder(TreeNode(1,
+                                                      TreeNode(2, TreeNode(4), TreeNode(5)),
+                                                      TreeNode(3))),
+                       [[1], [2,3], [4,5]])
     }
     
-    func testCase4() { // Mirrored
-        XCTAssertFalse(Solution().isSameTree(
-            TreeNode(1, TreeNode(2), TreeNode(3)),
-            TreeNode(1, TreeNode(3), TreeNode(2))
-        ))
-    }
-    
-    func testCase5() { // Uneven
-        XCTAssertFalse(Solution().isSameTree(
-            TreeNode(1, TreeNode(2), TreeNode(3)),
-            TreeNode(1)
-        ))
+    func testCase4() {
+        XCTAssertEqual(Solution().levelOrder(nil), [])
     }
 }
 
