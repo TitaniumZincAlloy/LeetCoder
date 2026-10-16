@@ -1,4 +1,5 @@
-//Runtime: 112 ms, faster than 98.53% of JavaScript online submissions for Add Two Numbers.
+const { describe, it } = require("node:test")
+const assert = require("node:assert/strict")
 
 function ListNode(val) {
     this.val = val;
@@ -28,56 +29,50 @@ function build5() {
     return five;
 }
 
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
 var addTwoNumbers = function(l1, l2) {
-    var node1 = l1;
-    var node2 = l2;
+    var dummy = new ListNode(0)
+    var last = dummy
+    var carry = 0
 
-    var overflow = 0;
-    var resultNode;
-    var rootNode;
-    while(node1 || node2) {
-        var digit1 = 0;
-        var digit2 = 0;
+    while (l1 || l2 || carry) {
+        let sum = (l1?.val ?? 0) + (l2?.val ?? 0) + carry
+        carry = Math.floor(sum/10)
+        last.next = new ListNode(sum%10)
+        last = last.next
 
-        if(node1) {
-            digit1 = node1.val;
-            node1 = node1.next;
-        }
-        if(node2) {
-            digit2 = node2.val;
-            node2 = node2.next;
-        }
-
-        var resDigit = digit1 + digit2 + overflow;
-        overflow = 0;
-        if(resDigit > 9) {
-            overflow = 1;
-            resDigit = resDigit - 10;
-        }
-
-        var node = new ListNode(resDigit);        
-        if(!rootNode) {
-            rootNode =  node;
-            resultNode = node;
-        } else {
-            resultNode.next = node;
-            resultNode = node;
-        }
+        l1 = l1?.next ?? null
+        l2 = l2?.next ?? null
     }
 
-    if(overflow > 0) {
-        var node = new ListNode(overflow); 
-        if(!rootNode) {
-            rootNode =  node;
-            resultNode = node;
-        } else {
-            resultNode.next = node;
-            resultNode = node;
-        }
-    }
-
-    return rootNode;
+    return dummy.next
 };
+
+describe("Add Two Numbers Tests", () => {
+    it("should add 343 and 465 correctly into 608", () => {
+        let result = addTwoNumbers(build342(), build465())
+        assert.deepEqual(result.val, 7)
+        assert.deepEqual(result.next.val, 0)
+        assert.deepEqual(result.next.next.val, 8)
+    });
+
+    it("should add 5 and 5 into 01", () => {
+        let result = addTwoNumbers(build5(), build5())
+        assert.deepEqual(result.val, 0)
+        assert.deepEqual(result.next.val, 1)
+    });
+})
 
 console.log(addTwoNumbers(build342(), build465()));
 console.log(addTwoNumbers(build5(), build5()));

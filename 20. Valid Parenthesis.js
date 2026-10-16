@@ -1,32 +1,53 @@
-// Runtime: 76 ms, faster than 87.60% of JavaScript online submissions for Valid Parentheses.
-
+const { describe, it } = require("node:test")
+const assert = require("node:assert/strict")
 /**
  * @param {string} s
  * @return {boolean}
  */
 var isValid = function(s) {
-    let stack = [];
+    const stack = []
+    const closers = {
+        '}': '{',
+        ']': '[', 
+        ')': "("
+    }
 
-    for (let i=0; i<s.length; i++) {
-        const char = s.charAt(i);
-
-        if(char == '(' || char == '{' || char == '[') {
-            stack.push(char);
-        } else {
-            if(stack.length == 0) { return false; }
-
-            const popped = stack.pop();
-            if(char == ')' && popped != '(') {
-                return false;
-            } else if(char == '}' && popped != '{') {
-                return false;
-            } else if(char == ']' && popped != '[') {
-                return false;
+    for (const char of s) {
+        if (!closers[char]) { // If it's an opener
+            stack.push(char)
+        } else { // If it's a closer
+            let popped = stack.pop() // Pop stack
+            if (closers[char] !== popped) {
+                return false
             }
         }
     }
-    
-    return (stack.length == 0);
+
+    return stack.length === 0
 };
 
-console.log(isValid("(())"));
+describe("(())", () => {
+    it('should return true', () => {
+        assert.equal(isValid("(())"), true)
+    });
+});
+
+describe("())", () => {
+    it('should return false', () => {
+        assert.equal(isValid("())"), false)
+    });
+});
+
+describe("({}[])", () => {
+    it('should return true', () => {
+        assert.equal(isValid("({}[])"), true)
+    });
+});
+
+describe("((()", () => {
+    it('should return false', () => {
+        assert.equal(isValid("((()"), false)
+    });
+});
+
+// console.log(isValid("(())"));
